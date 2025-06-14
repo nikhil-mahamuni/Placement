@@ -1,43 +1,68 @@
-# DJIKSTRA ALGORITHM
-````java
+### DIJKSTRA 
 
-public class Dijkstra {
-    static class Edge {
-        int node, weight;
-        Edge(int node, int weight) {
-            this.node = node;
+```java
+
+import java.util.*;
+
+public class Solution {
+
+    static class Node {
+        int vertex;
+        int weight;
+
+        Node(int vertex, int weight) {
+            this.vertex = vertex;
             this.weight = weight;
         }
     }
 
-    public static int[] dijkstra(int n, List<List<Edge>> graph, int start) {
-        int[] dist = new int[n + 1]; // Use n for 0-indexed, n+1 for 1-indexed
-        Arrays.fill(dist, Integer.MAX_VALUE);
-        dist[start] = 0;
+    public static ArrayList<Integer> dijkstra(ArrayList<ArrayList<Integer>> edges, int vertices, int edgeCount, int source) {
+        // Build adjacency map
+        Map<Integer, List<Node>> graph = new HashMap<>();
+        for (int i = 0; i < edgeCount; i++) {
+            int u = edges.get(i).get(0);
+            int v = edges.get(i).get(1);
+            int w = edges.get(i).get(2);
 
-        PriorityQueue<Edge> pq = new PriorityQueue<>((a, b) -> a.weight - b.weight);
-        pq.offer(new Edge(start, 0));
+            graph.putIfAbsent(u, new ArrayList<>());
+            graph.putIfAbsent(v, new ArrayList<>());
+
+            graph.get(u).add(new Node(v, w));
+            graph.get(v).add(new Node(u, w)); // Undirected graph
+        }
+
+        // Distance array
+        int[] dist = new int[vertices];
+        Arrays.fill(dist, Integer.MAX_VALUE);
+        dist[source] = 0;
+
+        // Min-heap to get the node with the smallest distance
+        PriorityQueue<Node> pq = new PriorityQueue<>((a, b) -> Integer.compare(a.weight, b.weight));
+        pq.offer(new Node(source, 0));
 
         while (!pq.isEmpty()) {
-            Edge curr = pq.poll();
-            int u = curr.node;
-            int d = curr.weight;
+            Node current = pq.poll();
+            int u = current.vertex;
+            int currentDist = current.weight;
 
-            if (d > dist[u]) continue;
+            // Skip if we already found a better path
+            if (currentDist > dist[u]) continue;
 
-            for (Edge neighbor : graph.get(u)) {
-                int v = neighbor.node;
-                int w = neighbor.weight;
+            for (Node neighbor : graph.getOrDefault(u, new ArrayList<>())) {
+                int v = neighbor.vertex;
+                int weight = neighbor.weight;
 
-                if (dist[v] > dist[u] + w) {
-                    dist[v] = dist[u] + w;
-                    pq.offer(new Edge(v, dist[v]));
+                if (dist[v] > dist[u] + weight) {
+                    dist[v] = dist[u] + weight;
+                    pq.offer(new Node(v, dist[v]));
                 }
             }
         }
 
-        return dist; // dist[i] gives shortest distance from start to node i
+        // Convert dist[] to ArrayList<Integer>
+        ArrayList<Integer> result = new ArrayList<>();
+        for (int d : dist) result.add(d);
+
+        return result;
     }
 }
-
-
