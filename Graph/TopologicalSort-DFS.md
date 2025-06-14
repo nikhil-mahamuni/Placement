@@ -1,3 +1,5 @@
+# Topological Sort valid only for directed acyclic graph
+
 ```java
 
  public static ArrayList<Integer> topologicalSort(ArrayList<ArrayList<Integer>> edges, int v, int e) 
